@@ -2,3 +2,4 @@
 datasets/raw/*
 datasets/processed/*
 *.ipynb_checkpoints*
+*.csv

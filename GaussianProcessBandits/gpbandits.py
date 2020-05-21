@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 
-def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=1000):
+def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500, verbose=True):
     """
     Chooses the best model by running the Gaussian Process Bandits algorithm on the hyperparameter space with the expected
     improvement heuristic.
@@ -17,6 +17,7 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=100
         cl (float): the characteristic length scale for the kernel
         v (float): the noise variance for the Gaussian Process
         num_samples (int): the number of samples
+        verbose (bool): if True, print each point and score
     Returns:
         model: a data model with the best hyperparameters set
     """
@@ -27,21 +28,25 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=100
     points = model.encode()[np.newaxis,:]
     scores = np.array([model.train_test_cv(data)])
     
+    # print update
+    if verbose:
+        print("Iteration: %03d | Design Point: %f | Score: %.06e" %(0, points[0,:], scores[0]))
+    
     # loop
-    for _ in range(iters):
+    for i in range(iters):
     
         # sample num_Samples random points from [0,1)^num_dims
         candidates = sample(num_dims, num_samples)
-        
+
         # find GP posterior
         A = formK(candidates, candidates, kernel, cl)
         B = formK(points, points, kernel, cl) + v*np.eye(points.shape[0])
         C = formK(candidates, points, kernel, cl)
-        tmp = C.dot(np.inv(B))
+        tmp = C.dot(np.linalg.inv(B))
         mu = tmp.dot(scores)
         Sigma = A - tmp.dot(C.T)
-        v = np.diagonal(Sigma) + np.finfo(float).eps
-        sig = np.sqrt(v)
+        var = np.diagonal(Sigma) + np.finfo(float).eps
+        sig = np.sqrt(var)
         
         # choose new point with best expected improvement
         exp_imp = expected_improvement(scores.min(), mu, sig)
@@ -63,6 +68,10 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=100
         
         # save progress
         save_checkpoint(points, scores)
+        
+        # print update
+        if verbose:
+            print("Iteration: %03d | Design Point: %f | Score: %.06e" %(i+1, best_point, new_score))
     
     # return best model
     ind = np.argmin(scores)
@@ -89,10 +98,10 @@ def formK(x, y, kernel, cl):
         raise('Kernel %s not implemented' %(kernel))
     
     # form kernel matrix
-    K = np.zeros(len(x),len(y))
+    K = np.zeros((x.shape[0], y.shape[0]))
     for i in range(len(x)):
         for j in range(len(y)):
-            K[i,j] = k(x[i],y[j]) 
+            K[i,j] = k(x[i], y[j]) 
             
     return K
     
@@ -134,7 +143,7 @@ def save_checkpoint(points, scores):
         scores (np.array): (num_points)-sized array of scores from evaluated points
     """
     X = np.hstack((points, scores[:,np.newaxis]))
-    numpy.savetxt("scores.csv", X, fmt='%.6e', delimiter=',') 
+    np.savetxt("scores.csv", X, fmt='%.6e', delimiter=',') 
     
 def load_checkpoint(model, scoresfile):
     """
