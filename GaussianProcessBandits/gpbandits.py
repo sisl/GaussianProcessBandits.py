@@ -33,11 +33,14 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500
         # sample num_Samples random points from [0,1)^num_dims
         candidates = sample(num_dims, num_samples)
         
-        # finding GP posterior
-        K = formK(points, candidates, kernel, cl)
-        
-        mu = 
-        v =
+        # find GP posterior
+        A = formK(candidates, candidates, kernel, cl)
+        B = formK(points, points, kernel, cl) + v*np.eye(points.shape[0])
+        C = formK(candidates, points, kernel, cl)
+        tmp = C.dot(np.inv(B))
+        mu = tmp.dot(scores)
+        Sigma = A - tmp.dot(C.T)
+        v = np.diagonal(Sigma) + np.finfo(float).eps
         sig = np.sqrt(v)
         
         # choose new point with best expected improvement
