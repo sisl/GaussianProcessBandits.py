@@ -58,7 +58,7 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=100
         new_score = model.train_test_cv(data) 
         
         # append to points/scores lists
-        points = np.vstack((points, new_point)) 
+        points = np.vstack((points, best_point)) # use best point, not re-encoded point to break discrete symmetries
         scores = np.append(scores, new_score) 
         
         # save progress
