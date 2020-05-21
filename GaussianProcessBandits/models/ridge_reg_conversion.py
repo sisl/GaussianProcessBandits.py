@@ -33,6 +33,16 @@ class ridge_reg_conversion: ## Rename it
     """
     def __init__(self, lambd = 0.5):
 
+        """
+        Parameters
+        ----------
+        num_dims : int
+            number of dimensions of the parameters.
+        lambd : float
+            L1 penalty coefficient.
+        model : Ridge regression model type
+            Ridge regression model defined in ridge_reg.py
+        """
         #Initial model hyperparemetrs
         self.num_dims = 1
         self.lambd = lambd #or some other default value

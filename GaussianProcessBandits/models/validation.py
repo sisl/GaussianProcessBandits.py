@@ -14,7 +14,7 @@ def k_fold_cross_val(X, y, folds, model):
     https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html
 
     Args:
-        X: (n_samples,n_feature)-numpy array features of the model of shape (n_sample, n_features)
+        X: (n_samples,n_feature)-numpy array features with data
         y: (n_samples,)-numpy array target variable vector of shape (n_sample,)
         folds: (int) number of folds the dataset is divided into int
         model: prediction model which contains fit and predict methods

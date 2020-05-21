@@ -36,6 +36,19 @@ class elastic_net_conversion: ## Rename it
     """
     def __init__(self, lambda_1 = 0.5, lambda_2 = 0.5):
 
+        """
+        Parameters
+        ----------
+        num_dims : int
+            number of dimensions of the parameters.
+        lambda_1 : float
+            L1 penalty coefficient.
+        lambda_2 : float
+            L2 penalty coefficient.
+        model : Elastic Net model type
+            Elastic Net model defined in ridge_reg.py
+        """
+
         #Initial model hyperparemetrs
         self.num_dims = 2
         self.lambda_1 = lambda_1
