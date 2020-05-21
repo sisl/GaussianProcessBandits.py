@@ -21,26 +21,27 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500
         model: a data model with the best hyperparameters set
     """
     
-    num_dims = model.num_dims # number of hyperparater dimensions
-    points = []
-    scores = []
+    num_dims = model.num_dims # number of hyperparameter dimensions
     
     # initial model evaluation
-    points.append(model.encode())
-    scores.append(model.train_test_cv(data))
+    points = model.encode()[np.newaxis,:]
+    scores = np.array([model.train_test_cv(data)])
     
     # loop
-    for i in range(iters):
+    for _ in range(iters):
     
-        # sample m random points from [0,1]^num_dims
+        # sample num_Samples random points from [0,1)^num_dims
         candidates = sample(num_dims, num_samples)
         
         # finding GP posterior
+        K = formK(points, candidates, kernel, cl)
         
-        K = formK(points, candidates, kernel, cl, v)
-        
+        mu = 
+        v =
+        sig = np.sqrt(v)
         
         # choose new point with best expected improvement
+        best_point = 0.0
         
         # set hyperparameters with best sampled point
         model.decode(best_point) 
@@ -52,15 +53,15 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500
         new_score = model.train_test_cv(data) 
         
         # append to points/scores lists
-        points.append(model.encode()) 
-        scores.append(model.train_test_cv(data)) 
+        points = np.vstack((points, new_point)) 
+        scores = np.append(scores, new_score) 
         
         # save progress
-        save(points, scores)
+        save_checkpoint(points, scores)
     
     # return best model
-    s = 0
-    best_overall_point = 0
+    ind = np.argmin(scores)
+    best_overall_point = points[ind]
     model.decode(best_overall_point)
     return model
         
@@ -104,11 +105,37 @@ def sample(num_dims, num_samples):
     ### TODO: Update with a uniform sampling plan to fill space 
     return samples
 
-def save(points, scores):
+def save_checkpoint(points, scores):
     """
     Save progress so far as a csv file, with each line containing each encoded point and associated model score.
     Args:
         points (np.array): (num_points, num_dims)-sized array of points evaluated so far
         scores (np.array): (num_points)-sized array of scores from evaluated points
     """
-    pass
+    X = np.hstack((points, scores[:,np.newaxis]))
+    numpy.savetxt("scores.csv", X, fmt='%.6e', delimiter=',') 
+    
+def load_checkpoint(model, scoresfile):
+    """
+    Load the best model, evaluated points, and evaluated scores from a Gaussian Process Bandits checkpoint file
+    Args:
+        model: a data model
+        scoresfile (String): path to a scores file to load from
+    Returns:
+        model: a data model with the best hyperparameters set
+        points (np.array): (num_points, num_dims)-sized array of points evaluated so far
+        scores (np.array): (num_points)-sized array of scores from evaluated points
+    """
+    # load data from scores file
+    X = np.loadtxt(scoresfile, delimiter=',')
+    
+    # separate into points and scores
+    scores = X[:,-1]
+    points = X[:,:-1]
+    
+    # set best hyperparameters based on best scores
+    ind = np.argmin(scores)
+    best_overall_point = points[ind]
+    model.decode(best_overall_point)
+    
+    return model, points, scores
