@@ -1,7 +1,7 @@
-#import random
 import numpy as np
+from scipy.stats import norm
 
-def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500):
+def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=1000):
     """
     Chooses the best model by running the Gaussian Process Bandits algorithm on the hyperparameter space with the expected
     improvement heuristic.
@@ -44,7 +44,9 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500
         sig = np.sqrt(v)
         
         # choose new point with best expected improvement
-        best_point = 0.0
+        exp_imp = expected_improvement(scores.min(), mu, sig)
+        best_idx = np.argmax(exp_imp)
+        best_point = candidates[best_idx]
         
         # set hyperparameters with best sampled point
         model.decode(best_point) 
@@ -107,6 +109,22 @@ def sample(num_dims, num_samples):
     samples = np.random.rand(num_samples, num_dims)
     ### TODO: Update with a uniform sampling plan to fill space 
     return samples
+
+def expected_improvement(ymin, mu, sig):
+    """
+    Return the expected improvement of each candidate point
+    Args:
+        ymin (float): the best score so far
+        mu (np.array): (num_samples,)-sized numpy array of posterior mean values at each candidate sample
+        sig (np.array): (num_samples,)-sized numpy array of posterior stdev values at each candidate samples
+    Returns:
+        ei (np.array): (num_samples,)-sized numpy array of expected improvement at each sample
+        
+    """
+    p_imp = norm.cdf((ymin-mu)/sig)
+    p_ymin = norm.pdf((ymin-mu)/sig)
+    ei = (ymin-mu)*p_imp + sig*p_ymin
+    return ei
 
 def save_checkpoint(points, scores):
     """
