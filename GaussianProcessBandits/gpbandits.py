@@ -9,7 +9,7 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=100
     Args:
         model: a data model, which must include a num_dims field for the number of hyperparameters, implement 
             a ``decode`` function which sets hyperparameters, an ``encode`` function which maps model hyperparameters 
-            back to (0,1)^num_dims, and a ``train_test_cv`` function which returns a cross-validated model score to be 
+            back to [0,1)^num_dims, and a ``train_test_cv`` function which returns a cross-validated model score to be 
             minimized.
         data: the raw training data (in appropriate form) to be fed to model.train_test_cv
         iters (int): the number of iterations to run the bandits algorithm
@@ -58,7 +58,7 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=100
         new_score = model.train_test_cv(data) 
         
         # append to points/scores lists
-        points = np.vstack((points, best_point)) # use best point, not re-encoded point to break discrete symmetries
+        points = np.vstack((points, best_point)) # use best_point, not re-encoded new_point to break discrete symmetries
         scores = np.append(scores, new_score) 
         
         # save progress
