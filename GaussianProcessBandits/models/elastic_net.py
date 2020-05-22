@@ -90,22 +90,7 @@ class ElasticNetReg:
 
         return point
 
-    def train_and_test_cv(self, data, k = 10):
-        """
-        Performs k-fold cross validation using the cross_val_score function with
-        k folds.
-
-        Args:
-            data (dataset type):  dataset
-            k (int): number of folds in the cross validation
-        """
-        X = data.X
-        y = data.y
-        error = k_fold_cross_val(X, y, k, self.model)
-
-        return error
-
-    def train_test_cv(self, data, folds = 4):
+    def train_test_cv(self, data, folds = 3):
 
         """
         Performs k-fold cross validation using the cross_val_score function with

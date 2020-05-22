@@ -3,7 +3,23 @@ import numpy as np
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 
-def train_and_test_cv(data, folds, model):
+class Dataset:
+    """
+    Simple class for the datasets.
+    """
+
+    def __init__(self, X, y):
+        """
+        Initializes a dataset for supervised learnining.
+
+        Args:
+            X: (n_samples,n_feature)-numpy array features with data
+            y: (n_samples,)-numpy array target variable vector 
+        """
+        self.X = X
+        self.y = y
+
+def train_test_cv(data, folds, model):
 
     """
     Performs k-fold cross validation using the cross_val_score function with
@@ -15,7 +31,7 @@ def train_and_test_cv(data, folds, model):
 
     Args:
         X: (n_samples,n_feature)-numpy array features with data
-        y: (n_samples,)-numpy array target variable vector of shape (n_sample,)
+        y: (n_samples,)-numpy array target variable vector
         folds: (int) number of folds the dataset is divided into int
         model: prediction model which contains fit and predict methods
 

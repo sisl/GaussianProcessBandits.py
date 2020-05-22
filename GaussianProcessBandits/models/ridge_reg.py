@@ -9,7 +9,7 @@ class RidgeReg:
     """
     Class defining Linear Regression with L2 Penalty (Ridge Regression)
     """
-    def __init__(self, lambd = 100.0):
+    def __init__(self, lambd = 10.0):
         """
         Initializes model parameters.
         Args:
@@ -64,7 +64,7 @@ class RidgeReg:
             point (np.array): (1,)-sized numpy array with hyperparameters in the black-box optimization scale
         """
 
-        self.lambd = np.exp(12 * point[0]- 10) #Equivalent to the lambda from 1e-15 to 1e3.
+        self.lambd = np.exp(10 * point[0]- 5) #Equivalent to the lambda from 1e-15 to 1e3.
         #print(self.lambd)
 
     def encode(self):
@@ -78,13 +78,13 @@ class RidgeReg:
 
         #Converts hyperparameters value back to the points between [0,1]
         point = np.zeros((1,))
-        point[0] = (np.log(self.lambd) + 10)/12
+        point[0] = (np.log(self.lambd) + 5)/10
 
         #Add assert
 
         return point
 
-    def train_test_cv(self, data, folds = 4):
+    def train_test_cv(self, data, folds = 3):
         """
         Performs k-fold cross validation using the cross_val_score function with
         k folds.
