@@ -2,13 +2,13 @@ import numpy as np
 
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
-from ridge_reg import ridge_reg
-from elastic_net import elastic_net
 
-def k_fold_cross_val(X, y, folds, model):
+def train_and_test_cv(data, folds, model):
 
     """
-    K-fold cross validation.
+    Performs k-fold cross validation using the cross_val_score function with
+    k folds.
+
     Uses the K-fold implementation from scikit learn.
 
     https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html
@@ -24,7 +24,8 @@ def k_fold_cross_val(X, y, folds, model):
         folds
 
     """
-
+    X = data.X
+    y = data.y
     errors = []
     kf = KFold(n_splits = folds)
 
