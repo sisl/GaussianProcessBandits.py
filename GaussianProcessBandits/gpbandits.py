@@ -36,7 +36,8 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500
 
     # print update
     if verbose:
-        print("Iteration: %03d | Design Point: %f | Score: %.06e" %(0, points[0,:], scores[0]))
+        print("Iteration: %03d | Score: %.06e" %(0, scores[0]))
+        #print("Iteration: %03d | Design Point: %f | Score: %.06e" %(0,points[0,:] scores[0]))
 
     # loop
     for i in range(iters):
@@ -77,7 +78,8 @@ def gpbandits(model, data, iters=10, kernel='se', cl=0.1, v=0.0, num_samples=500
 
         # print update
         if verbose:
-            print("Iteration: %03d | Design Point: %f | Score: %.06e" %(i+1, best_point, new_score))
+            print("Iteration: %03d | Score: %.06e" %(i+1, new_score))
+            #print("Iteration: %03d | Design Point: %f | Score: %.06e" %(i+1, best_point, new_score))
 
         if best_model_log:
             ind = np.argmin(scores)
