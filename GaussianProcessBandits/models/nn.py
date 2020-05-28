@@ -28,8 +28,8 @@ class NeuralNet:
 
         #Initial model hyperparemetrs
         self.num_dims = 4
-        self.max_hid_layers = 3
-        self.max_hid_units = 128
+        self.max_hid_layers = 2
+        self.max_hid_units = 32
         self.input_dim = input_dim
         self.num_classes = num_classes
 
@@ -112,7 +112,7 @@ class NeuralNet:
 
         lr = 0.001
         #momentum = 0.5
-        max_epochs = 100
+        max_epochs = 20
         #prev_loss = 0
 
         criterion = nn.CrossEntropyLoss()
@@ -149,7 +149,7 @@ class NeuralNet:
             #     #Converged
             #     break
 
-            print("training loss: ", running_loss)
+            #print("training loss: ", running_loss)
 
             #prev_loss = running_loss
             running_loss = 0.0

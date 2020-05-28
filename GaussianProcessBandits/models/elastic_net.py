@@ -26,10 +26,11 @@ class ElasticNetReg:
         self.num_dims = 2
         self.lambda_1 = lambda_1
         self.lambda_2 = lambda_2
-        self.alpha = 2*self.lambda_2 + self.lambda_1
+        self.alpha = self.lambda_2 + self.lambda_1
         self.l1_ratio = self.lambda_1/self.alpha
-        self.max_iter = 1e06 ##Too many? It wll terminate early if it converges with tol=1e-04.
-        self._model = ElasticNet(alpha = self.alpha, l1_ratio=self.l1_ratio, max_iter = self.max_iter)
+        self.max_iter = 1e04 ##Too many? It wll terminate early if it converges with tol=1e-04.
+        self.model_ = ElasticNet(alpha = self.alpha, l1_ratio=self.l1_ratio, max_iter = self.max_iter)
+        self.score = None
 
     def fit(self,X,y):
         """
@@ -41,7 +42,7 @@ class ElasticNetReg:
             y (np.array): (n_samples,)-numpy array target variable vector
         """
 
-        self._model.fit(X,y)
+        self.model_.fit(X,y)
 
     def predict(self,X):
         """
@@ -55,7 +56,7 @@ class ElasticNetReg:
             y (np.array): (n_samples,)-numpy array with predicted target variable
         """
 
-        y_pred = self._model.predict(X)
+        y_pred = self.model_.predict(X)
 
         return y_pred
 
@@ -72,6 +73,11 @@ class ElasticNetReg:
         self.lambda_1 = np.exp(12 * point[0]- 10) #Equivalent to the lambda from 1e-15 to 1e3.
         self.lambda_2 = np.exp(12 * point[1]- 10) #Equivalent to the lambda from 1e-15 to 1e3.
 
+        self.alpha = self.lambda_2 + self.lambda_1
+        self.l1_ratio = self.lambda_1/self.alpha
+        self.max_iter = 1e04 ##Too many? It wll terminate early if it converges with tol=1e-04.
+        self.model_ = ElasticNet(alpha = self.alpha, l1_ratio=self.l1_ratio, max_iter = self.max_iter)
+
     def encode(self):
         """
         Encodes the parameter point from ridge_reg class scale [1e-15, 1e3) to
@@ -82,7 +88,7 @@ class ElasticNetReg:
         """
 
         #Converts hyperparameters value back to the points between [0,1]
-        point = np.zeros((1,))
+        point = np.zeros((2,))
         point[0] = (np.log(self.lambda_1) + 10)/12
         point[1] = (np.log(self.lambda_2) + 10)/12
 
@@ -127,5 +133,7 @@ class ElasticNetReg:
             errors.append(error)
 
         avg_error = np.mean(errors)
+
+        self.score = avg_error
 
         return avg_error
