@@ -8,16 +8,19 @@ class Dataset:
     Simple class for the datasets.
     """
 
-    def __init__(self, X, y):
+    def __init__(self, X, y, train_loader = None, test_loader = None, dataloader = False):
         """
         Initializes a dataset for supervised learnining.
 
         Args:
             X: (n_samples,n_feature)-numpy array features with data
-            y: (n_samples,)-numpy array target variable vector 
+            y: (n_samples,)-numpy array target variable vector
         """
         self.X = X
         self.y = y
+        self.train_loader = train_loader
+        self.test_loader = test_loader
+        self.dataloder = dataloader
 
 def train_test_cv(data, folds, model):
 
